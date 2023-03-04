@@ -1,0 +1,45 @@
+body,
+h1
+{
+  margin: 0;
+}
+
+body {
+  min-height: 100vh;
+  background-color: rgb(56, 56, 56);
+  font-size: 16px;
+  color: #fff;
+  line-height: 1.4;
+}
+
+.wrapper
+{
+  max-width: 65rem;
+  margin: auto;
+  padding: 0 3em;
+}
+
+.site
+{
+  &-header
+  {
+    display: flex;
+    align-items: center;
+    min-height: 4em;
+    box-sizing: border-box;
+    border-bottom: 1px solid #fff;
+  }
+
+  &-title
+  {
+    font-size: 1.2em;
+    text-align: center;
+
+    &__by
+    {
+      display: block;
+      font-size: .8em;
+      font-weight: 500;
+    }
+  }
+}
