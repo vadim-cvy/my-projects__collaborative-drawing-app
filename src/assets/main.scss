@@ -1,10 +1,15 @@
+@import './vars.scss';
+
 body,
-h1
+h1,
+h2
 {
   margin: 0;
 }
 
 body {
+  display: grid;
+  grid-template-rows: auto 1fr;
   min-height: 100vh;
   background-color: rgb(56, 56, 56);
   font-size: 16px;
@@ -25,9 +30,9 @@ body {
   {
     display: flex;
     align-items: center;
-    min-height: 4em;
+    height: 4em;
     box-sizing: border-box;
-    border-bottom: 1px solid #fff;
+    border-bottom: 1px solid var(--markup-lines-color);
   }
 
   &-title
