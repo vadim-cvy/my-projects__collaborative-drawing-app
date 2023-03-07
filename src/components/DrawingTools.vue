@@ -1,17 +1,13 @@
 <script lang="ts" setup>
   import DrawingTool from './DrawingTool.vue'
-  import { ref } from 'vue'
+  import { useDrawingBoardStore } from '@/stores/drawing-board/useDrawingBoardStore';
+  import { storeToRefs } from 'pinia';
 
-  const drawingTools = {
-    pencil: {
-      label: 'Pencil',
-    },
-    brush: {
-      label: 'Brush',
-    },
-  }
+  const store = useDrawingBoardStore()
 
-  const selectedTool = ref('pencil')
+  const tools = store.tools
+
+  const { selectedToolIndex } = storeToRefs( store )
 </script>
 
 <template>
@@ -22,11 +18,11 @@
 
     <div class="tools-list">
       <DrawingTool
-        v-for="( tool, toolName ) in drawingTools"
-        :key="toolName"
-        v-model="selectedTool"
-        :label="tool.label"
-        :name="toolName"
+        v-for="( tool, i ) in tools"
+        :key="tool.name"
+        :tool="tool"
+        :is-selected="selectedToolIndex === i"
+        @click="selectedToolIndex = i"
       ></DrawingTool>
     </div>
   </div>

@@ -1,33 +1,30 @@
 <script lang="ts" setup>
+import { DrawingTool } from '@/stores/drawing-board/DrawingTool';
+
 defineProps({
-  modelValue: {
-    type: String,
+  tool: {
+    type: DrawingTool,
     required: true,
   },
 
-  label: {
-    type: String,
+  isSelected: {
+    type: Boolean,
     required: true,
-  },
-
-  name: {
-    type: String,
-    required: true
   },
 })
-
-defineEmits( [ 'update:modelValue' ] )
 </script>
 
 <template>
   <button
     type="button"
-    class="tool"
-    @click="$emit( 'update:modelValue', name )"
+    :class="{
+      tool: true,
+      'tool_is-selected': isSelected,
+    }"
   >
-    <span>Brush</span>
-
-    <img src="" alt="Brush">
+    <span>
+      {{ tool.label }}
+    </span>
   </button>
 </template>
 
@@ -44,6 +41,11 @@ defineEmits( [ 'update:modelValue' ] )
   &:active
   {
     transform: scale(95%);
+  }
+
+  &_is-selected
+  {
+    border-color: rgb(255, 255, 0);
   }
 }
 </style>

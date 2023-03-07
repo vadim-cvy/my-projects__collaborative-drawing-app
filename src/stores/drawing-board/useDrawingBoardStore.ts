@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, readonly } from 'vue'
+import { DrawingTool } from './DrawingTool';
 
 export const useDrawingBoardStore = defineStore('drawingBoard', () =>
 {
@@ -42,26 +43,36 @@ export const useDrawingBoardStore = defineStore('drawingBoard', () =>
 
   window.onresize = () => _canvasElement.value ? syncWrapperRatio() : undefined
 
-  const resolution = computed(() =>
-  {
-    const
-      width = 1280,
-      height = 720
+  const resolution = {
+    width: 1280,
+    height: 720,
 
-    return {
-      width,
-      height,
-      ratio: width / height,
+    get ratio()
+    {
+      return this.width / this.height
     }
-  })
+  }
 
-  const orientation = computed(() => wrapperRatio.value > resolution.value.ratio ? 'horizontal' : 'vertical' )
+  const orientation = computed(() => wrapperRatio.value > resolution.ratio ? 'horizontal' : 'vertical' )
+
+  const tools = [
+    new DrawingTool( 'pencil', 'Pencil' ),
+    new DrawingTool( 'brush', 'Brush' ),
+    new DrawingTool( 'rectangle', 'Rectangle' ),
+  ]
+
+  const
+    selectedToolIndex = ref( 0 ),
+    selectedTool = computed(() => tools[ selectedToolIndex.value ] )
 
   return {
     wrapperElement,
     canvasElement,
-    wrapperRatio,
-    resolution,
+    wrapperRatio: readonly( wrapperRatio ),
+    resolution: readonly( resolution ),
     orientation,
+    tools: readonly( tools ),
+    selectedToolIndex,
+    selectedTool,
   }
 })
