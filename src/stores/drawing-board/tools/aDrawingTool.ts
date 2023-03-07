@@ -21,6 +21,23 @@ export abstract class aDrawingTool
     return this._ctx
   }
 
+  protected _color: string | null = null
+
+  public get color() : string
+  {
+    if ( this._color === null )
+    {
+      throw new Error( 'Color is not set!' )
+    }
+
+    return this._color
+  }
+
+  public set color( color: string )
+  {
+    this._color = color
+  }
+
   public abstract draw( x: number, y: number ) : void
 
   public abstract stop() : void

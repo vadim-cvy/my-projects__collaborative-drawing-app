@@ -69,6 +69,9 @@ export const useDrawingBoardStore = defineStore('drawingBoard', () =>
     }
 
     tool.ctx = ctx
+
+    // todo: add ability to select
+    tool.color = '#000'
   }))
 
   const
