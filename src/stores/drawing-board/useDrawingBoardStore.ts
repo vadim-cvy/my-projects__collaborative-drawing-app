@@ -5,7 +5,7 @@ import { DrawingTool } from './DrawingTool';
 export const useDrawingBoardStore = defineStore('drawingBoard', () =>
 {
   const
-    _canvasElement = ref<HTMLElement | null>( null ),
+    _canvasElement = ref<HTMLCanvasElement | null>( null ),
     canvasElement = computed({
       get()
       {
@@ -16,7 +16,7 @@ export const useDrawingBoardStore = defineStore('drawingBoard', () =>
 
         return _canvasElement.value
       },
-      set( canvasElement: HTMLElement )
+      set( canvasElement: HTMLCanvasElement )
       {
         _canvasElement.value = canvasElement
       }
