@@ -46,6 +46,8 @@ watch( canvasSize,
   }
 )
 
+let isDrawing = false
+
 const initCanvas = () =>
 {
   const canvas = canvasElement.value
@@ -53,19 +55,14 @@ const initCanvas = () =>
   canvas.width = resolution.width
   canvas.height = resolution.height
 
-  let isDrawing = false
-
   canvas.addEventListener( 'mousedown', e =>
   {
     isDrawing = true
     draw( e )
   })
 
-  canvas.addEventListener( 'mouseup', () =>
-  {
-    isDrawing = false
-    selectedTool.value.stop()
-  })
+  canvas.addEventListener( 'mouseup', stopDrawing )
+  canvas.addEventListener( 'mouseout', stopDrawing )
 
   canvas.addEventListener( 'mousemove', e => isDrawing ? draw( e ) : undefined )
 }
@@ -87,6 +84,19 @@ const draw = ( e: MouseEvent ) =>
     y = ( e.clientY - rect.top ) / sizeToResolutionRatio
 
   selectedTool.value.draw( x, y )
+}
+
+const stopDrawing = ( e: MouseEvent ) =>
+{
+  if ( ! isDrawing )
+  {
+    return
+  }
+
+  draw( e )
+
+  isDrawing = false
+  selectedTool.value.stop()
 }
 
 onMounted( initCanvas )
@@ -127,6 +137,7 @@ watch( () => store.wrapperRatio, () =>
     width: 0;
     height: 0;
     background-color: #fff;
+    cursor: pointer;
   }
 }
 </style>
