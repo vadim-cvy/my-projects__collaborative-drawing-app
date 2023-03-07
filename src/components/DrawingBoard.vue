@@ -9,6 +9,7 @@ const {
   canvasElement,
   wrapperElement,
   orientation,
+  selectedTool,
 } = storeToRefs( store )
 
 const resolution = store.resolution
@@ -52,35 +53,24 @@ const initCanvas = () =>
   canvas.width = resolution.width
   canvas.height = resolution.height
 
-  const ctx = canvas.getContext('2d')
-
-  if ( ctx === null )
-  {
-    throw new Error( 'Context is not defined' )
-  }
-
   let isDrawing = false
 
   canvas.addEventListener( 'mousedown', e =>
   {
     isDrawing = true
-
-    draw( ctx, e )
+    draw( e )
   })
 
-  canvas.addEventListener( 'mouseup', () => isDrawing = false )
-
-  canvas.addEventListener( 'mousemove', e =>
+  canvas.addEventListener( 'mouseup', () =>
   {
-    if ( isDrawing )
-    {
-      draw( ctx, e )
-    }
+    isDrawing = false
+    selectedTool.value.stop()
   })
+
+  canvas.addEventListener( 'mousemove', e => isDrawing ? draw( e ) : undefined )
 }
 
-// todo: ignores selected tool for now
-const draw = ( ctx: CanvasRenderingContext2D, e: MouseEvent ) =>
+const draw = ( e: MouseEvent ) =>
 {
   if ( e.target === null || ! ( e.target instanceof Element ) )
   {
@@ -96,12 +86,7 @@ const draw = ( ctx: CanvasRenderingContext2D, e: MouseEvent ) =>
     x = ( e.clientX - rect.left ) / sizeToResolutionRatio,
     y = ( e.clientY - rect.top ) / sizeToResolutionRatio
 
-  // todo: add ability to select
-  ctx.fillStyle = 'blue'
-
-  ctx.beginPath()
-  ctx.arc(x, y, .5, 0, Math.PI * 2)
-  ctx.fill()
+  selectedTool.value.draw( x, y )
 }
 
 onMounted( initCanvas )

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed, watch, readonly } from 'vue'
-import { DrawingTool } from './DrawingTool';
+import { Pencil } from './tools/Pencil';
 
 export const useDrawingBoardStore = defineStore('drawingBoard', () =>
 {
@@ -56,10 +56,20 @@ export const useDrawingBoardStore = defineStore('drawingBoard', () =>
   const orientation = computed(() => wrapperRatio.value > resolution.ratio ? 'horizontal' : 'vertical' )
 
   const tools = [
-    new DrawingTool( 'pencil', 'Pencil' ),
-    new DrawingTool( 'brush', 'Brush' ),
-    new DrawingTool( 'rectangle', 'Rectangle' ),
+    new Pencil()
   ]
+
+  watch( _canvasElement, () => tools.forEach( tool =>
+  {
+    const ctx = canvasElement.value.getContext('2d')
+
+    if ( ctx === null )
+    {
+      throw new Error( 'Can\'t get canvas context!' )
+    }
+
+    tool.ctx = ctx
+  }))
 
   const
     selectedToolIndex = ref( 0 ),
