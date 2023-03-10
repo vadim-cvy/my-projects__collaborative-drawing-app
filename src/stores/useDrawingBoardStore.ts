@@ -1,17 +1,17 @@
-import CanvasStateHistory from '@/components/drawing-board/inc/CanvasStateHistory';
-import { Pencil } from '@/components/drawing-tools/inc/Pencil';
-import { Rectangle } from '@/components/drawing-tools/inc/Rectangle';
+import type CanvasStateHistory from '@/components/drawing-board/inc/CanvasStateHistory';
+import type aDrawingTool from '@/components/drawing-tools/inc/aDrawingTool';
 import { defineStore } from 'pinia'
-import { ref, computed, watch, readonly } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 export const useDrawingBoardStore = defineStore('drawingBoard', () =>
 {
   const
     _canvasElement = ref<HTMLCanvasElement | null>( null ),
+    isCanvasElementSet = computed(() => !! _canvasElement.value ),
     canvasElement = computed({
       get()
       {
-        if ( _canvasElement.value === null )
+        if ( ! _canvasElement.value )
         {
           throw new Error( 'Canvas element not found!' );
         }
@@ -22,86 +22,69 @@ export const useDrawingBoardStore = defineStore('drawingBoard', () =>
       {
         _canvasElement.value = canvasElement
       }
-    });
+    })
 
-  const wrapperElement = computed(() =>
+  const canvasContext = computed(() =>
   {
-    const wrapperElement = canvasElement.value.parentElement
+    const ctx = canvasElement.value.getContext( '2d' )
 
-    if ( wrapperElement === null )
-    {
-      throw new Error( 'Wrapper element not found!' );
-    }
-
-    return wrapperElement
-  })
-
-  const wrapperRatio = ref( 0 )
-
-  const syncWrapperRatio = () =>
-    wrapperRatio.value = wrapperElement.value.offsetWidth / wrapperElement.value.offsetHeight
-
-  watch( _canvasElement, syncWrapperRatio )
-
-  window.onresize = () => _canvasElement.value ? syncWrapperRatio() : undefined
-
-  const resolution = {
-    width: 1280,
-    height: 720,
-
-    get ratio()
-    {
-      return this.width / this.height
-    }
-  }
-
-  const orientation = computed(() => wrapperRatio.value > resolution.ratio ? 'horizontal' : 'vertical' )
-
-  const tools = [
-    new Pencil(),
-    new Rectangle(),
-  ]
-
-  const stateHistory = new CanvasStateHistory()
-
-  watch( _canvasElement, () =>
-  {
-    const canvas = canvasElement.value
-
-    const ctx = canvas.getContext('2d')
-
-    if ( ctx === null )
+    if ( ! ctx )
     {
       throw new Error( 'Can\'t get canvas context!' )
     }
 
-    stateHistory.canvas = canvas
-    stateHistory.ctx = ctx
-
-    tools.forEach( tool =>
-    {
-      tool.ctx = ctx
-
-      // todo: add ability to select
-      tool.color = '#000'
-
-      tool.stateHistory = stateHistory
-    })
+    return ctx
   })
 
   const
-    selectedToolIndex = ref( 0 ),
-    selectedTool = computed(() => tools[ selectedToolIndex.value ] )
+    _stateHistory = ref<CanvasStateHistory | null>( null ),
+    isStateHistorySet = computed(() => !! _stateHistory.value ),
+    stateHistory = computed({
+      get()
+      {
+        if ( ! _stateHistory.value )
+        {
+          throw new Error( 'State history is not set!' );
+        }
+
+        return _stateHistory.value
+      },
+      set( stateHistory )
+      {
+        _stateHistory.value = stateHistory
+      }
+    })
+
+  const
+    _selectedTool = ref<aDrawingTool | null>( null ),
+    selectedTool = computed({
+      get()
+      {
+        if ( ! _selectedTool.value )
+        {
+          throw new Error( 'No tool is selected!' );
+        }
+
+        return _selectedTool.value
+      },
+      set( selectedTool )
+      {
+        _selectedTool.value = selectedTool
+      }
+    })
+
+  const orientation = ref<'horizontal' | 'vertical' | null>( null )
 
   return {
-    wrapperElement,
     canvasElement,
-    wrapperRatio,
-    resolution,
-    orientation,
-    tools,
-    selectedToolIndex,
-    selectedTool,
+    isCanvasElementSet,
+    canvasContext,
+
+    isStateHistorySet,
     stateHistory,
+
+    orientation,
+
+    selectedTool,
   }
 })

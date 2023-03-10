@@ -1,13 +1,34 @@
 <script lang="ts" setup>
-  import DrawingTool from './DrawingTool.vue'
-  import { useDrawingBoardStore } from '@/stores/useDrawingBoardStore';
-  import { storeToRefs } from 'pinia';
+import { useDrawingBoardStore } from '@/stores/useDrawingBoardStore';
+import { storeToRefs } from 'pinia';
+import { Pencil } from './inc/Pencil';
+import { Rectangle } from './inc/Rectangle';
+import { ref, watch } from 'vue';
+import type aDrawingTool from './inc/aDrawingTool';
+import DrawingTool from './DrawingTool.vue';
 
-  const store = useDrawingBoardStore()
+const store = useDrawingBoardStore()
 
-  const { tools } = store
+const {
+  isStateHistorySet,
+  canvasContext,
+  selectedTool,
+  stateHistory,
+} = storeToRefs( store )
 
-  const { selectedToolIndex } = storeToRefs( store )
+const tools = ref<Array<aDrawingTool>>( [] )
+
+const selectedToolIndex = ref( 0 )
+
+watch( isStateHistorySet, () =>
+{
+  tools.value.push( new Pencil( canvasContext.value, stateHistory.value ) )
+  tools.value.push( new Rectangle( canvasContext.value, stateHistory.value ) )
+
+  selectedTool.value = tools.value[ selectedToolIndex.value ]
+})
+
+watch( selectedToolIndex, () => selectedTool.value = tools.value[ selectedToolIndex.value ] )
 </script>
 
 <template>

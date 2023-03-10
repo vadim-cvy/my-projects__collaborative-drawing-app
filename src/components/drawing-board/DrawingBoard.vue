@@ -1,45 +1,82 @@
 <script lang="ts" setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useDrawingBoardStore } from '@/stores/useDrawingBoardStore';
+import CanvasStateHistory from './inc/CanvasStateHistory';
 
 const store = useDrawingBoardStore()
 
 const {
+  isCanvasElementSet,
   canvasElement,
-  wrapperElement,
+  canvasContext,
   orientation,
   selectedTool,
-  wrapperRatio,
+  stateHistory,
 } = storeToRefs( store )
 
-const {
-  resolution,
-  stateHistory
-} = store
+watch( isCanvasElementSet,
+  () => stateHistory.value = new CanvasStateHistory( canvasElement.value, canvasContext.value )
+)
 
-const canvasSize = ref({
+const resolution = {
+  width: 1280,
+  height: 720,
+
+  get ratio()
+  {
+    return this.width / this.height
+  }
+}
+
+const wrapperElement = computed(() =>
+{
+  const wrapperElement = canvasElement.value.parentElement
+
+  if ( ! wrapperElement )
+  {
+    throw new Error( 'Wrapper element not found!' );
+  }
+
+  return wrapperElement
+})
+
+const wrapperRatio = ref( 0 )
+
+const syncWrapperRatio = () =>
+  wrapperRatio.value = wrapperElement.value.offsetWidth / wrapperElement.value.offsetHeight
+
+watch( isCanvasElementSet, syncWrapperRatio )
+
+window.onresize = () => isCanvasElementSet.value ? syncWrapperRatio() : undefined
+
+watch( wrapperRatio, () => orientation.value = wrapperRatio.value > resolution.ratio ? 'horizontal' : 'vertical' )
+
+const size = ref({
   height: 0,
   width: 0,
 })
 
-watch( wrapperRatio, () =>
-{
-  const size = canvasSize.value
-
-  if ( orientation.value === 'horizontal' )
+watch(
+  () => wrapperRatio.value && orientation.value,
+  () =>
   {
-    size.height = wrapperElement.value.offsetHeight
-    size.width = size.height * resolution.ratio
-  }
-  else if ( orientation.value === 'vertical' )
-  {
-    size.width = wrapperElement.value.offsetWidth
-    size.height = size.width / resolution.ratio
-  }
-})
+    const s = size.value
 
-watch( canvasSize,
+    if ( orientation.value === 'horizontal' )
+    {
+      s.height = wrapperElement.value.offsetHeight
+      s.width = s.height * resolution.ratio
+    }
+    else if ( orientation.value === 'vertical' )
+    {
+      s.width = wrapperElement.value.offsetWidth
+      s.height = s.width / resolution.ratio
+    }
+  }
+)
+
+watch( size,
   size =>
   {
     canvasElement.value.style.width = size.width + 'px'
@@ -60,7 +97,7 @@ const initCanvas = () =>
   canvas.addEventListener( 'mousedown', startDrawing )
 }
 
-const startDrawing = ( e: MouseEvent ) => stateHistory.saveState(() =>
+const startDrawing = ( e: MouseEvent ) => stateHistory.value.saveState(() =>
 {
   // console.log( 'DrawingBoard::startDrawing' )
 
@@ -97,35 +134,19 @@ const drawPoint = ( e: MouseEvent, isLastPoint: boolean = false ) =>
     throw new Error( 'Can\'t detect event target!' )
   }
 
-  const sizeToResolutionRatio = Number(
-    ( canvasSize.value.width / resolution.width ).toFixed( 5 )
+  const sizeToresolutionRatio = Number(
+    ( size.value.width / resolution.width ).toFixed( 5 )
   )
 
   const
     rect = e.target.getBoundingClientRect(),
-    x = Math.round( ( e.clientX - rect.left ) / sizeToResolutionRatio ),
-    y = Math.round( ( e.clientY - rect.top ) / sizeToResolutionRatio )
+    x = Math.round( ( e.clientX - rect.left ) / sizeToresolutionRatio ),
+    y = Math.round( ( e.clientY - rect.top ) / sizeToresolutionRatio )
 
   selectedTool.value.addPoint( x, y, isLastPoint )
 }
 
 onMounted( initCanvas )
-
-watch( wrapperRatio, () =>
-{
-  const cssDimensions = canvasSize.value
-
-  if ( orientation.value === 'horizontal' )
-  {
-    cssDimensions.height = wrapperElement.value.offsetHeight
-    cssDimensions.width = cssDimensions.height * resolution.ratio
-  }
-  else if ( orientation.value === 'vertical' )
-  {
-    cssDimensions.width = wrapperElement.value.offsetWidth
-    cssDimensions.height = cssDimensions.width / resolution.ratio
-  }
-})
 </script>
 
 <template>

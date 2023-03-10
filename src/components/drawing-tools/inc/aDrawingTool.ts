@@ -3,62 +3,18 @@ import type tDrawingToolPoint from "./tDrawingToolPoint"
 
 export default abstract class aDrawingTool
 {
+  constructor(
+    protected ctx: CanvasRenderingContext2D,
+    protected stateHistory: CanvasStateHistory
+  ) {}
+
   public abstract get name() : string
 
   public abstract get label() : string
 
-  protected _stateHistory: CanvasStateHistory | null = null
-
-  public set stateHistory( stateHistory: CanvasStateHistory )
-  {
-    this._stateHistory = stateHistory
-  }
-
-  public get stateHistory() : CanvasStateHistory
-  {
-    if ( this._stateHistory === null )
-    {
-      throw new Error( 'State history is not set!' )
-    }
-
-    return this._stateHistory
-  }
-
   protected path = new Path2D()
 
-  protected _ctx: CanvasRenderingContext2D | null = null
-
-  public set ctx( ctx: CanvasRenderingContext2D )
-  {
-    this._ctx = ctx
-  }
-
-  public get ctx() : CanvasRenderingContext2D
-  {
-    if ( this._ctx === null )
-    {
-      throw new Error( 'Rendering context is not set!' )
-    }
-
-    return this._ctx
-  }
-
-  protected _color: string | null = null
-
-  public get color() : string
-  {
-    if ( this._color === null )
-    {
-      throw new Error( 'Color is not set!' )
-    }
-
-    return this._color
-  }
-
-  public set color( color: string )
-  {
-    this._color = color
-  }
+  public color: string = '#000'
 
   protected size = 5
 
