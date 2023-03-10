@@ -1,11 +1,11 @@
 <script lang="ts" setup>
   import DrawingTool from './DrawingTool.vue'
-  import { useDrawingBoardStore } from '@/stores/drawing-board/useDrawingBoardStore';
+  import { useDrawingBoardStore } from '@/stores/useDrawingBoardStore';
   import { storeToRefs } from 'pinia';
 
   const store = useDrawingBoardStore()
 
-  const tools = store.tools
+  const { tools } = store
 
   const { selectedToolIndex } = storeToRefs( store )
 </script>

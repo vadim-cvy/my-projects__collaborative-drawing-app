@@ -1,8 +1,8 @@
+import CanvasStateHistory from '@/components/drawing-board/inc/CanvasStateHistory';
+import { Pencil } from '@/components/drawing-tools/inc/Pencil';
+import { Rectangle } from '@/components/drawing-tools/inc/Rectangle';
 import { defineStore } from 'pinia'
 import { ref, computed, watch, readonly } from 'vue'
-import CanvasStateHistory from './inc/CanvasStateHistory';
-import { Pencil } from './inc/tools/Pencil';
-import { Rectangle } from './inc/tools/Rectangle';
 
 export const useDrawingBoardStore = defineStore('drawingBoard', () =>
 {

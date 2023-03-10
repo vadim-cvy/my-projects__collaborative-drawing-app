@@ -1,5 +1,4 @@
-
-import type CanvasStateHistory from "../CanvasStateHistory"
+import type CanvasStateHistory from "@/components/drawing-board/inc/CanvasStateHistory"
 import type tDrawingToolPoint from "./tDrawingToolPoint"
 
 export default abstract class aDrawingTool

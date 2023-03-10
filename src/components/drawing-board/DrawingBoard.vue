@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, watch, onMounted } from 'vue'
-import { useDrawingBoardStore } from '@/stores/drawing-board/useDrawingBoardStore'
 import { storeToRefs } from 'pinia'
+import { useDrawingBoardStore } from '@/stores/useDrawingBoardStore';
 
 const store = useDrawingBoardStore()
 

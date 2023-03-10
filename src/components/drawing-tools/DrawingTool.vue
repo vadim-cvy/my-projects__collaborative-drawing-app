@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import aDrawingTool from '@/stores/drawing-board/inc/tools/aDrawingTool';
+import aDrawingTool from './inc/aDrawingTool';
 
 defineProps({
   tool: {
