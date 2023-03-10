@@ -13,8 +13,14 @@ export class Rectangle extends aShape
     return 'Rectangle'
   }
 
-  protected setShape( path: Path2D, leftTopPoint: tDrawingToolPoint, width: number, height: number )
+  protected setShape(
+    path: Path2D,
+    startPoint: tDrawingToolPoint,
+    endPoint: tDrawingToolPoint,
+    width: number,
+    height: number
+  )
   {
-    path.rect( leftTopPoint.x, leftTopPoint.y, width, height )
+    path.rect( startPoint.x, startPoint.y, width, height )
   }
 }

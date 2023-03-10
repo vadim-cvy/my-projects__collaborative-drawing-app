@@ -7,6 +7,7 @@ import { ref, watch } from 'vue';
 import type aDrawingTool from './inc/aDrawingTool';
 import DrawingTool from './DrawingTool.vue';
 import { Elipse } from './inc/Elipse';
+import { Line } from './inc/Line';
 
 const store = useDrawingBoardStore()
 
@@ -24,6 +25,7 @@ const selectedToolIndex = ref( 0 )
 watch( isStateHistorySet, () =>
 {
   tools.value.push( new Pencil( canvasContext.value, stateHistory.value ) )
+  tools.value.push( new Line( canvasContext.value, stateHistory.value ) )
   tools.value.push( new Rectangle( canvasContext.value, stateHistory.value ) )
   tools.value.push( new Elipse( canvasContext.value, stateHistory.value ) )
 

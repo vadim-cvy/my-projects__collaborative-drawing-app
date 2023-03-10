@@ -10,28 +10,41 @@ export abstract class aShape extends aDrawingTool
     const firstPoint = this.points[0]
 
     const
-      x1 = Math.min( firstPoint.x, point.x ),
-      x2 = Math.max( firstPoint.x, point.x )
+      startPoint = this.getStartPoint( firstPoint, point ),
+      endPoint = this.getEndPoint( firstPoint, point )
 
     const
-      y1 = Math.min( firstPoint.y, point.y ),
-      y2 = Math.max( firstPoint.y, point.y )
-
-    const
-      width = x2 - x1,
-      height = y2 - y1
+      width = Math.max( startPoint.x, endPoint.x ) - Math.min( startPoint.x, endPoint.x ),
+      height = Math.max( startPoint.y, endPoint.y ) - Math.min( startPoint.y, endPoint.y )
 
     const path = new Path2D()
 
-    const leftTopPoint: tDrawingToolPoint = {
-      x: x1,
-      y: y1,
-    }
-
-    this.setShape( path, leftTopPoint, width, height )
+    this.setShape( path, startPoint, endPoint, width, height )
 
     this.path = path
   }
 
-  protected abstract setShape( path: Path2D, leftTopPoint: tDrawingToolPoint, width: number, height: number ) : void
+  protected abstract setShape(
+    path: Path2D,
+    startPoint: tDrawingToolPoint,
+    endPoint: tDrawingToolPoint,
+    width: number,
+    height: number
+  ) : void
+
+  protected getStartPoint( a: tDrawingToolPoint, b: tDrawingToolPoint ) : tDrawingToolPoint
+  {
+    return {
+      x: Math.min( a.x, b.x ),
+      y: Math.min( a.y, b.y ),
+    }
+  }
+
+  protected getEndPoint( a: tDrawingToolPoint, b: tDrawingToolPoint ) : tDrawingToolPoint
+  {
+    return {
+      x: Math.max( a.x, b.x ),
+      y: Math.max( a.y, b.y ),
+    }
+  }
 }

@@ -13,15 +13,21 @@ export class Elipse extends aShape
     return 'Elipse'
   }
 
-  protected setShape( path: Path2D, leftTopPoint: tDrawingToolPoint, width: number, height: number )
+  protected setShape(
+    path: Path2D,
+    startPoint: tDrawingToolPoint,
+    endPoint: tDrawingToolPoint,
+    width: number,
+    height: number
+  )
   {
     const
       radiusX = width / 2,
       radiusY = height / 2
 
     const
-      xCenter = leftTopPoint.x + radiusX,
-      yCenter = leftTopPoint.y + radiusY
+      xCenter = startPoint.x + radiusX,
+      yCenter = startPoint.y + radiusY
 
     path.ellipse(
       xCenter,
