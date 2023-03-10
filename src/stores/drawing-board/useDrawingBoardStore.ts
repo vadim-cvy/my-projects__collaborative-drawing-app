@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia'
 import { ref, computed, watch, readonly } from 'vue'
-import { Pencil } from './tools/Pencil';
+import CanvasStateHistory from './inc/CanvasStateHistory';
+import { Pencil } from './inc/tools/Pencil';
+import { Rectangle } from './inc/tools/Rectangle';
 
 export const useDrawingBoardStore = defineStore('drawingBoard', () =>
 {
@@ -56,23 +58,36 @@ export const useDrawingBoardStore = defineStore('drawingBoard', () =>
   const orientation = computed(() => wrapperRatio.value > resolution.ratio ? 'horizontal' : 'vertical' )
 
   const tools = [
-    new Pencil()
+    new Pencil(),
+    new Rectangle(),
   ]
 
-  watch( _canvasElement, () => tools.forEach( tool =>
+  const stateHistory = new CanvasStateHistory()
+
+  watch( _canvasElement, () =>
   {
-    const ctx = canvasElement.value.getContext('2d')
+    const canvas = canvasElement.value
+
+    const ctx = canvas.getContext('2d')
 
     if ( ctx === null )
     {
       throw new Error( 'Can\'t get canvas context!' )
     }
 
-    tool.ctx = ctx
+    stateHistory.canvas = canvas
+    stateHistory.ctx = ctx
 
-    // todo: add ability to select
-    tool.color = '#000'
-  }))
+    tools.forEach( tool =>
+    {
+      tool.ctx = ctx
+
+      // todo: add ability to select
+      tool.color = '#000'
+
+      tool.stateHistory = stateHistory
+    })
+  })
 
   const
     selectedToolIndex = ref( 0 ),
@@ -81,11 +96,12 @@ export const useDrawingBoardStore = defineStore('drawingBoard', () =>
   return {
     wrapperElement,
     canvasElement,
-    wrapperRatio: readonly( wrapperRatio ),
-    resolution: readonly( resolution ),
+    wrapperRatio,
+    resolution,
     orientation,
-    tools: readonly( tools ),
+    tools,
     selectedToolIndex,
     selectedTool,
+    stateHistory,
   }
 })

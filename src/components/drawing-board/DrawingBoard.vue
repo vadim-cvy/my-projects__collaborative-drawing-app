@@ -10,16 +10,20 @@ const {
   wrapperElement,
   orientation,
   selectedTool,
+  wrapperRatio,
 } = storeToRefs( store )
 
-const resolution = store.resolution
+const {
+  resolution,
+  stateHistory
+} = store
 
 const canvasSize = ref({
   height: 0,
   width: 0,
 })
 
-watch( () => store.wrapperRatio, () =>
+watch( wrapperRatio, () =>
 {
   const size = canvasSize.value
 
@@ -46,8 +50,6 @@ watch( canvasSize,
   }
 )
 
-let isDrawing = false
-
 const initCanvas = () =>
 {
   const canvas = canvasElement.value
@@ -55,20 +57,41 @@ const initCanvas = () =>
   canvas.width = resolution.width
   canvas.height = resolution.height
 
-  canvas.addEventListener( 'mousedown', e =>
-  {
-    isDrawing = true
-    draw( e )
-  })
+  canvas.addEventListener( 'mousedown', startDrawing )
+}
+
+const startDrawing = ( e: MouseEvent ) => stateHistory.saveState(() =>
+{
+  // console.log( 'DrawingBoard::startDrawing' )
+
+  const canvas = canvasElement.value
+
+  drawPoint( e )
+
+  canvas.addEventListener( 'mousemove', drawPoint )
 
   canvas.addEventListener( 'mouseup', stopDrawing )
   canvas.addEventListener( 'mouseout', stopDrawing )
+})
 
-  canvas.addEventListener( 'mousemove', e => isDrawing ? draw( e ) : undefined )
+const stopDrawing = ( e: MouseEvent ) =>
+{
+  // console.log( 'DrawingBoard::stopDrawing' )
+
+  const canvas = canvasElement.value
+
+  drawPoint( e, true )
+
+  canvas.removeEventListener( 'mousemove', drawPoint )
+
+  canvas.removeEventListener( 'mouseup', stopDrawing )
+  canvas.removeEventListener( 'mouseout', stopDrawing )
 }
 
-const draw = ( e: MouseEvent ) =>
+const drawPoint = ( e: MouseEvent, isLastPoint: boolean = false ) =>
 {
+  // console.log( 'DrawingBoard::drawPoint' )
+
   if ( e.target === null || ! ( e.target instanceof Element ) )
   {
     throw new Error( 'Can\'t detect event target!' )
@@ -80,28 +103,15 @@ const draw = ( e: MouseEvent ) =>
 
   const
     rect = e.target.getBoundingClientRect(),
-    x = ( e.clientX - rect.left ) / sizeToResolutionRatio,
-    y = ( e.clientY - rect.top ) / sizeToResolutionRatio
+    x = Math.round( ( e.clientX - rect.left ) / sizeToResolutionRatio ),
+    y = Math.round( ( e.clientY - rect.top ) / sizeToResolutionRatio )
 
-  selectedTool.value.draw( x, y )
-}
-
-const stopDrawing = ( e: MouseEvent ) =>
-{
-  if ( ! isDrawing )
-  {
-    return
-  }
-
-  draw( e )
-
-  isDrawing = false
-  selectedTool.value.stop()
+  selectedTool.value.addPoint( x, y, isLastPoint )
 }
 
 onMounted( initCanvas )
 
-watch( () => store.wrapperRatio, () =>
+watch( wrapperRatio, () =>
 {
   const cssDimensions = canvasSize.value
 

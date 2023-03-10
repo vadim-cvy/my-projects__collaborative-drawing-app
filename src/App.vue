@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import DrawingBoard from './components/DrawingBoard.vue';
+import DrawingBoard from './components/drawing-board/DrawingBoard.vue';
 import DrawingTools from './components/DrawingTools.vue';
 </script>
 
